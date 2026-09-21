@@ -5,6 +5,8 @@ import { AppService } from './app.service.js';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { GraphQlResolver } from './resolver.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -27,9 +29,13 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         outputAs: 'class',
       },
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public', 'icones'),
+      serveRoot: '/icones',
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GraphQlResolver],
 })
 export class AppModule { }
 
