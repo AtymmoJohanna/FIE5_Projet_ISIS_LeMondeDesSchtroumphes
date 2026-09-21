@@ -35,14 +35,14 @@ export class AppService {
     if (!prod) {
       throw new Error(`Ce produit n'existe pas`);
     }
-    const coutTotal = quantite / 2 * (2 * prod.cout + (quantite - 1) * prod.cout * (prod.croissance - 1));
-    const canBuy = world.money >= coutTotal;
+    const coutachat = (prod.cout * (Math.pow(prod.croissance, quantite) - 1)) / (prod.croissance - 1)
+    const canBuy = world.money >= coutachat;
     if (!canBuy) {
       throw new Error(`Vous n'avez pas assez d'argent pour acheter ce produit`);
     }
-    world.money -= coutTotal;
+    world.money -= coutachat;
     prod.quantite += quantite;
-    prod.cout += prod.croissance * quantite;
+    prod.cout = prod.cout * Math.pow(prod.croissance, quantite);
     this.saveWorld(user, world);
     return prod;
   }
@@ -59,26 +59,60 @@ export class AppService {
     this.saveWorld(user, world);
     return prod;
   }
-  engagerManager(user: string, palier: Palier): Palier {
+  engagerManager(user: string, name: string): Palier {
     const world = this.readUserWorld(user);
-    const manager = world.managers.find((m) => m.name === palier.name);
+    const manager = world.managers.find((m) => m.name === name);
     if (!manager) {
-      throw new Error(`Ce manager n'existe pas`);
+      throw new Error(`Ce schtroumphmanager n'existe pas`);
     }
     const product = world.products.find((p) => p.id === manager.idcible);
     if (!product) {
-      throw new Error(`Ce manager ne gère aucun produit`);
+      throw new Error(`Ce schtroumph manager ne gère aucun produit`);
     }
     if (manager.unlocked) {
-      throw new Error(`Ce manager est déjà engagé`);
+      throw new Error(`Ce schtroumph manager est déjà engagé`);
     }
     if (world.money < manager.seuil) {
-      throw new Error(`Vous n'avez pas assez d'argent pour engager ce manager`);
+      throw new Error(`Vous n'avez pas assez d'argent pour engager ce schtroumph manager`);
     }
     world.money -= manager.seuil;
     manager.unlocked = true;
     product.managerUnlocked = true;
     this.saveWorld(user, world);
     return manager;
+  }
+  private updateWorld(world: World): World {
+    const now = Date.now();
+    const elapsedTime = now - world.lastupdate;
+    world.lastupdate = now;
+    if (elapsedTime > 0) {
+      world.products.forEach((prod) => {
+        if (!prod.managerUnlocked) {// Cas sans manager : une seule production possible, pas de boucle
+          if (prod.timeleft > 0) {
+            if (prod.timeleft <= elapsedTime) {// La production s'est terminée entre-temps
+              const revenue = prod.revenu * prod.quantite;
+              world.money += revenue;
+              world.score += revenue;
+              prod.timeleft = 0;
+            } else {
+              prod.timeleft -= elapsedTime;
+            }
+          }
+        } else { // Cas avec manager : la production se relance automatiquement en boucle
+          const progress = prod.timeleft > 0 ? prod.vitesse - prod.timeleft : 0;
+          const totalProgress = progress + elapsedTime;
+          const cycles = Math.floor(totalProgress / prod.vitesse); //combien de productions complètes ont eu lieu
+          const remainder = totalProgress % prod.vitesse; //temps déjà avancé dans le cycle actuellement en cours
+          if (cycles > 0) {
+            const gains = cycles * prod.revenu * prod.quantite;
+            world.money += gains;
+            world.score += gains;
+          }
+          prod.timeleft = prod.vitesse - remainder; // temps restant pour la production en cours
+        }
+      });
+      world.lastupdate = now;
+    }
+    return world;
   }
 }
