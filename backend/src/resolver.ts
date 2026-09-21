@@ -16,16 +16,23 @@ export class GraphQlResolver {
         @Args('id') id: number,
         @Args('quantite') quantite: number,
     ) {
-        try {
-            const world = this.service.readUserWorld(user);
-            const prod = world.products.find((p) => p.id === id);
-            if(!prod) return undefined;
-            prod.quantite += quantite;
-            this.service.saveWorld(user, world);
-            return prod;
-        } catch (e: unknown) {
-            console.log((e as Error).message);
-            return undefined;
-        }
+        const prod = this.service.acheterQtProduit(user, id, quantite);
+        return prod;
+    }
+    @Mutation()
+    async lancerProductionProduit(
+        @Args('user') user: string,
+        @Args('id') id: number,
+    ) {
+        const prod = this.service.lancerProductionProduit(user, id);
+        return prod;
+    }
+    @Mutation()
+    async engagerManager(
+        @Args('user') user: string,
+        @Args('palier') palier: Palier,
+    ) {
+        const manager = this.service.engagerManager(user, palier);
+        return manager;
     }
 }
