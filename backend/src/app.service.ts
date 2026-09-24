@@ -7,15 +7,17 @@ import { Palier, Product, World } from './graphql.js';
 @Injectable()
 export class AppService {
   readUserWorld(user: string): World {
+    let world: World;
     try {
       const data = fs.readFileSync(
         path.join(process.cwd(), 'userworlds/', user + '-world.json'),
       );
-      return JSON.parse(data.toString());
+      world = JSON.parse(data.toString());
     } catch (e: unknown) {
       console.log((e as Error).message);
-      return origworld;
+      world = JSON.parse(JSON.stringify(origworld));
     }
+    return world;
   }
   saveWorld(user: string, world: World) {
     fs.writeFile(
@@ -43,6 +45,33 @@ export class AppService {
     world.money -= coutachat;
     prod.quantite += quantite;
     prod.cout = prod.cout * Math.pow(prod.croissance, quantite);
+    for (const palier of prod.paliers) {
+      if (!palier.unlocked && prod.quantite >= palier.seuil) {
+        if (palier.typeratio === 'vitesse') {
+          prod.vitesse /= palier.ratio;
+        } else if (palier.typeratio === 'gain') {
+          prod.revenu *= palier.ratio;
+        }
+        palier.unlocked = true;
+      }
+    }
+    const qteMin = Math.min(...world.products.map((p) => p.quantite));
+    for (const palier of world.allunlocks) {
+      if (!palier.unlocked && qteMin >= palier.seuil) {
+        if (palier.typeratio === 'vitesse') {
+          world.products.forEach((p) => {
+            p.vitesse /= palier.ratio;
+          });
+        } else if (palier.typeratio === 'gain') {
+          world.products.forEach((p) => {
+            p.revenu *= palier.ratio;
+          });
+        } else if (palier.typeratio === 'ange') {
+          world.angelbonus *= palier.ratio;
+        }
+        palier.unlocked = true;
+      }
+    }
     this.saveWorld(user, world);
     return prod;
   }
@@ -53,7 +82,7 @@ export class AppService {
       throw new Error(`Ce produit n'existe pas`);
     }
     if (prod.timeleft > 0) {
-      throw new Error(`La production de ce produit est déjà en cours`);
+      throw new Error(`Ce produit est déjà en production`);
     }
     prod.timeleft = prod.vitesse;
     this.saveWorld(user, world);
@@ -89,7 +118,7 @@ export class AppService {
       world.products.forEach((prod) => {
         if (!prod.managerUnlocked) {// Cas sans manager : une seule production possible, pas de boucle
           if (prod.timeleft > 0) {
-            if (prod.timeleft <= elapsedTime) {// La production s'est terminée entre-temps
+            if (prod.timeleft <= elapsedTime) {
               const revenue = prod.revenu * prod.quantite;
               world.money += revenue;
               world.score += revenue;
@@ -114,5 +143,66 @@ export class AppService {
       world.lastupdate = now;
     }
     return world;
+  }
+  acheterCashUpgrade(user: string, name: string): Palier {
+    const world = this.readUserWorld(user);
+    const upgrade = world.upgrades.find((u) => u.name === name);
+    if (!upgrade) {
+      throw new Error(`Cet upgrade n'existe pas`);
+    }
+    if (upgrade.unlocked) {
+      throw new Error(`Cet upgrade est déjà acheté`);
+    }
+    if (world.money < upgrade.seuil) {
+      throw new Error(`Vous n'avez pas assez d'argent pour acheter cet upgrade`);
+    }
+    world.money -= upgrade.seuil;
+    upgrade.unlocked = true;
+    const product = world.products.find((p) => p.id === upgrade.idcible);
+    if (product) {
+      if (upgrade.typeratio === 'vitesse') {
+        product.vitesse /= upgrade.ratio;
+      } else if (upgrade.typeratio === 'gain') {
+        product.revenu *= upgrade.ratio;
+      }
+      this.saveWorld(user, world);
+    }
+    return upgrade;
+  }
+  acheterAngelUpgrade(user: string, name: string): Palier {
+    const world = this.readUserWorld(user);
+    const upgrade = world.angelupgrades.find((u) => u.name === name);
+    if (!upgrade) {
+      throw new Error(`Cet upgrade n'existe pas`);
+    }
+    if (upgrade.unlocked) {
+      throw new Error(`Cet upgrade est déjà acheté`);
+    }
+    if (world.activeangels < upgrade.seuil) {
+      throw new Error(`Vous n'avez pas assez d'anges pour acheter cet upgrade`);
+    }
+    world.activeangels -= upgrade.seuil;
+    upgrade.unlocked = true;
+    const product = world.products.find((p) => p.id === upgrade.idcible);
+    if (product) {
+      if (upgrade.typeratio === 'vitesse') {
+        product.vitesse /= upgrade.ratio;
+      } else if (upgrade.typeratio === 'gain') {
+        product.revenu *= upgrade.ratio;
+      }
+      this.saveWorld(user, world);
+    }
+    return upgrade;
+  }
+  resetWorld(user: string): World {
+    const world = this.readUserWorld(user);
+    const nbAngeesGagnes = world.totalangels - world.activeangels; //à corriger
+    const newWorld : World = JSON.parse(JSON.stringify(origworld));
+    newWorld.score = world.score;
+    newWorld.activeangels += nbAngeesGagnes;
+    newWorld.totalangels += nbAngeesGagnes;
+    newWorld.lastupdate = Date.now();
+    this.saveWorld(user, newWorld);
+    return newWorld;
   }
 }

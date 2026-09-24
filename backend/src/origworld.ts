@@ -257,7 +257,7 @@ export const origworld = {
             name: 'Angelic Mutiny',
             logo: 'icones/angel.png',
             seuil: 100000,
-            idcible: -1,
+            idcible: 1,
             ratio: 2,
             typeratio: RatioType.ange,
             unlocked: false,

@@ -35,4 +35,20 @@ export class GraphQlResolver {
         const manager = this.service.engagerManager(user, name);
         return manager;
     }
+    @Mutation()
+    async acheterCashUpgrade(
+        @Args('user') user: string,
+        @Args('name') name: string,
+    ) {
+        const upgrade = this.service.acheterCashUpgrade(user, name);
+        return upgrade;
+    }
+    @Mutation()
+    async acheterAngelUpgrade(
+        @Args('user') user: string,
+        @Args('name') name: string,
+    ) {
+        const upgrade = this.service.acheterAngelUpgrade(user, name);
+        return upgrade;
+    }
 }
