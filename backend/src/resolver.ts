@@ -51,4 +51,9 @@ export class GraphQlResolver {
         const upgrade = this.service.acheterAngelUpgrade(user, name);
         return upgrade;
     }
+    @Mutation()
+    async resetWorld(@Args('user') user: string) {
+        const world = this.service.resetWorld(user);
+        return world;
+    }
 }
