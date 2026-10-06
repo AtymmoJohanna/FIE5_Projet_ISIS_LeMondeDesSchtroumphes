@@ -67,3 +67,151 @@ query GetWorld($user: String!) {
         }
     }
 }
+mutation AcheterQtProduit($user: String!, $id: Int!, $quantite: Int!){
+    acheterQtProduit(user:$user, id:$id, quantite:$quantite){
+        id
+        name
+        logo
+        cout
+        croissance
+        revenu
+        vitesse
+        quantite
+        timeleft
+        managerUnlocked
+        paliers {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+    }
+}
+mutation LancerProductionProduit($user: String!, $id: Int!){
+    lancerProductionProduit(user:$user, id:$id){
+        id
+        name
+        logo
+        cout
+        croissance
+        revenu
+        vitesse
+        quantite
+        timeleft
+        managerUnlocked
+        paliers {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+    }
+}
+mutation EngagerManager($user: String!, $name: String!){
+    engagerManager(user:$user, name:$name){
+        name
+        logo
+        seuil
+        idcible
+        ratio
+        typeratio
+        unlocked
+    }
+}
+mutation AcheterCashUpgrade($user: String!, $name: String!){
+    acheterCashUpgrade(user:$user, name:$name){
+        name
+        logo
+        seuil
+        idcible
+        ratio
+        typeratio
+        unlocked
+    }
+}
+mutation AcheterAngelUpgrade($user: String!, $name: String!){
+    acheterAngelUpgrade(user:$user, name:$name){
+        name
+        logo
+        seuil
+        idcible
+        ratio
+        typeratio
+        unlocked
+    }
+}
+mutation ResetWorld($user: String!){
+    resetWorld(user:$user){
+        name
+        logo
+        money
+        score
+        totalangels
+        activeangels
+        angelbonus
+        lastupdate
+        products {
+            id
+            name
+            logo
+            cout
+            croissance
+            revenu
+            vitesse
+            quantite
+            timeleft
+            managerUnlocked
+            paliers {
+                name
+                logo
+                seuil
+                idcible
+                ratio
+                typeratio
+                unlocked
+            }
+        }
+        allunlocks {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+        upgrades {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+        angelupgrades {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+        managers {
+            name
+            logo
+            seuil
+            idcible
+            ratio
+            typeratio
+            unlocked
+        }
+    }
+}
