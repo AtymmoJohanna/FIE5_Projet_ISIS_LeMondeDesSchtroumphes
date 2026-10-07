@@ -1,0 +1,321 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Roboto', sans-serif;
+    background: #dff4ff;
+    color: #243447;
+}
+
+/* HEADER */
+
+.header {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    align-items: center;
+
+    min-height: 90px;
+    padding: 10px 24px;
+
+    background: linear-gradient(135deg,
+            #ad16d2 0%,
+            #2da9e9 50%,
+            #bd77d8 100%);
+
+    color: white;
+
+    box-shadow: 0 4px 12px rgba(19, 93, 140, 0.3);
+    position: relative;
+    z-index: 10;
+}
+
+/* Petit effet nuage / lumière */
+.header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    height: 16px;
+
+    background: #ffffff;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+
+    opacity: 0.9;
+}
+
+/* Monde */
+
+.world-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+}
+
+.world-info .round {
+    width: 68px;
+    height: 68px;
+
+    border: 4px solid white;
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.25),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.world-name {
+    font-size: 1.45rem;
+    font-weight: 900;
+
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Argent */
+
+.money {
+    justify-self: center;
+
+    padding: 10px 22px;
+
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-radius: 18px;
+
+    font-size: 1.5rem;
+    font-weight: 900;
+
+    color: #fff;
+
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+
+    backdrop-filter: blur(5px);
+}
+
+.money {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.money::before {
+    content: "";
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+
+    background: url('/images/money.png') center / contain no-repeat;
+}
+
+/* Multiplicateur */
+
+.qtmulti {
+    justify-self: center;
+}
+
+/* Identifiant */
+
+.userid {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+
+    position: relative;
+    z-index: 1;
+}
+
+.userid input {
+    width: 120px;
+
+    padding: 9px 12px;
+
+    border: 2px solid white;
+    border-radius: 12px;
+
+    outline: none;
+
+    background: white;
+    color: #24506b;
+
+    font-weight: bold;
+
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.userid input:focus {
+    border-color: #ffd83d;
+    box-shadow: 0 0 0 3px rgba(255, 216, 61, 0.35);
+}
+
+/* BOUTONS */
+
+button[mat-raised-button] {
+    border-radius: 14px !important;
+
+    font-weight: 900 !important;
+    letter-spacing: 0.3px;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+button[mat-raised-button]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+button[mat-raised-button]:active {
+    transform: translateY(1px);
+}
+
+/* Bouton quantité */
+
+.qtmulti button {
+    background: #ffd83d !important;
+    color: #684d00 !important;
+
+    border: 3px solid #fff2a8 !important;
+
+    min-width: 70px;
+}
+
+/* CORPS*/
+
+.main {
+    flex: 1;
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    grid-template-rows: minmax(0, 1fr);
+
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.8) 0 45px, transparent 46px),
+        radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.7) 0 35px, transparent 36px),
+        linear-gradient(180deg, #e9f8ff 0%, #d5f1ff 100%);
+}
+
+/* MENU GAUCHE */
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    padding: 22px 16px;
+
+    overflow-y: auto;
+
+    background:
+        linear-gradient(rgba(14, 117, 183, 0.35),
+            rgba(17, 104, 159, 0.50)),
+        url('/images/menu_1.png');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    border-right: 4px solid rgba(255, 255, 255, 0.5);
+
+    box-shadow: 4px 0 12px rgba(130, 0, 124, 0.15);
+}
+
+.actionb {
+    width: 100%;
+    min-height: 48px;
+
+    background: #ffffff !important;
+    color: #126da7 !important;
+
+    border: 3px solid #8dd8f7 !important;
+
+    font-weight: 900 !important;
+
+    box-shadow: 0 4px 0 #75bcd9 !important;
+}
+
+.actionb:hover {
+    background: #fff9cf !important;
+    border-color: #ffd83d !important;
+
+    transform: translateY(-2px);
+}
+
+.actionb:active {
+    box-shadow: 0 1px 0 #75bcd9 !important;
+}
+
+/* LISTE DES PRODUITS */
+
+.products {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-content: start;
+
+    gap: 16px;
+
+    padding: 24px;
+
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/*RESPONSIVE*/
+
+@media (max-width: 850px) {
+    .header {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .money {
+        justify-self: end;
+    }
+
+    .qtmulti {
+        justify-self: start;
+    }
+
+    .userid {
+        justify-self: end;
+    }
+
+    .main {
+        grid-template-columns: 150px 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        grid-template-columns: 1fr;
+    }
+
+    .world-info,
+    .money,
+    .qtmulti,
+    .userid {
+        justify-self: center;
+    }
+
+    .main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .menu {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .products {
+        padding: 12px;
+    }
+}

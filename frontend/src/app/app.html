@@ -1,46 +1,50 @@
-import { CodegenConfig } from '@graphql-codegen/cli';
-const config: CodegenConfig = {
-schema: [
-'./src/app/graphql/schema.graphql',
-{
-'./src/app/**/*.state.ts': {
-noRequire: true,
-},
-},
-],
-config: {
-importSchemaTypesFrom: './src/app/graphql/types.ts',
-useTypeImports: true,
-operationResultSuffix: 'Data',
-dedupeOperationSuffix: true,
-inlineFragmentTypes: 'combine',
-avoidOptionals: {
-field: true,
-},
-},
-generates: {
-'./src/app/graphql/types.ts': {
-plugins: [
-{
-add: {
-content: '/* eslint-disable */',
-},
-},
-'typescript',
-],
-},
-'./src/app/graphql/operations.ts': {
-documents: ['./src/app/graphql/**/*.graphql', '!./src/app/graphql/schema.graphql'],
-plugins: [
-{
-add: {
-content: '/* eslint-disable */',
-},
-},
-'typescript-operations',
-'@apollo-orbit/codegen',
-],
-},
-},
-};
-export default config;
+<div class="header">
+  <div class="world-info">
+    <img class="round" [src]="gameService.server() + '/' + world()?.logo" />
+    <span class="world-name">{{ world()?.name }}</span>
+  </div>
+
+  <div class="money">
+    <span id="money" [innerHTML]="(world()?.money ?? 0) | bigvalue"></span>
+  </div>
+
+  <div class="qtmulti">
+    <button mat-raised-button color="primary">
+      x1
+    </button>
+  </div>
+
+  <div class="userid">
+    <span>Your ID :</span>
+    <input type="text" placeholder="pseudo" />
+  </div>
+</div>
+
+<div class="main">
+  <div class="menu">
+    <button mat-raised-button color="primary" class="actionb">
+      Unlocks
+    </button>
+    <button mat-raised-button color="primary" class="actionb">
+      Cash Upgrades
+    </button>
+    <button mat-raised-button color="primary" class="actionb">
+      Angel Upgrades
+    </button>
+    <button mat-raised-button color="primary" class="actionb">
+      Managers
+    </button>
+    <button mat-raised-button color="primary" class="actionb">
+      Investors
+    </button>
+  </div>
+
+  <div class="products">
+    @for (product of world()?.products ?? []; track product.id) {
+      <app-produit
+        [prod]="product"
+        class="product">
+      </app-produit>
+    }
+  </div>
+</div>

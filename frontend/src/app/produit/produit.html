@@ -1,1 +1,32 @@
-<p>produit works!</p>
+<div class="produit-layout">
+  <!-- Partie gauche : image du produit avec sa quantité superposée -->
+  <div class="produit-image">
+    <img class="round" [src]="gameService.server() + '/' + prod()?.logo" [alt]="prod()?.name"/>
+    <span class="quantite-badge">{{ prod()?.quantite }}</span>
+  </div>
+
+  <!-- Partie droite : production (haut) + achat (bas) -->
+  <div class="produit-droite">
+    <!-- Partie haute : barre de progression + gain -->
+    <div class="produit-production" (click)="startFabrication()">
+      <div class="progressbar">
+        <div class="fill" [style.width.%]="0"></div>
+      </div>
+      <span class="gain">
+        {{ (prod()?.revenu ?? 0) * (prod()?.quantite ?? 0) | bigvalue }}
+      </span>
+    </div>
+
+    <!-- Partie basse : achat -->
+    <div class="produit-achat">
+      <div class="nom-produit">{{ prod()?.name }}</div>
+      <button
+        class="buy-button"
+        mat-raised-button
+        color="primary">
+        Buy x1 — {{ (prod()?.cout ?? 0) | bigvalue }}
+      </button>
+      <span class="timeleft">{{ prod()?.timeleft }}</span>
+    </div>
+  </div>
+</div>

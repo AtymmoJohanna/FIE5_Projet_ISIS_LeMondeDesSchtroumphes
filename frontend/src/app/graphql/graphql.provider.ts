@@ -6,7 +6,7 @@ export function provideGraphQL(): EnvironmentProviders {
         provideApollo(
             withApolloOptions(() => {
                 const httpLinkFactory = inject(HttpLinkFactory);
-                const httpLink = httpLinkFactory.create({ uri: 'http://localhost:4000/graphql' })
+                const httpLink = httpLinkFactory.create({ uri: 'http://localhost:3000/graphql' })
                 return {
                     cache: new InMemoryCache(),
                     link: httpLink
