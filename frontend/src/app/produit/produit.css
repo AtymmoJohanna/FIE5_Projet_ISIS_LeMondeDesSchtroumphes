@@ -44,6 +44,7 @@
 
 .produit-image {
   position: relative;
+  cursor: pointer;
 
   width: 105px;
   height: 105px;
@@ -272,6 +273,22 @@
 .buy-button:active {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #d7ad22 !important;
+}
+
+.buy-button {
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Bouton grisé quand on n'a pas assez d'argent */
+.buy-button:disabled {
+  background: #e3e8eb !important;
+  color: #9aa7ae !important;
+  border-color: #f1f4f5 !important;
+  box-shadow: 0 4px 0 #c5cdd1 !important;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Temps restant */

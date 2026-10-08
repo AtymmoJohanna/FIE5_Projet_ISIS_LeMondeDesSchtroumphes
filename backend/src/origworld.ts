@@ -7,7 +7,7 @@ export const origworld = {
     totalangels: 0,
     activeangels: 0,
     angelbonus: 2,
-    lastupdate: 0,
+    lastupdate: '0',
     products: [
 {
     id: 1,
@@ -25,7 +25,7 @@ export const origworld = {
         name: "La forêt regorge de salsepareille !",
         logo: "icones/salsepareille.png",
         seuil: 20,
-        idcible: 1,
+        idcible: -1,
         ratio: 2,
         typeratio: RatioType.vitesse,
         unlocked: false,

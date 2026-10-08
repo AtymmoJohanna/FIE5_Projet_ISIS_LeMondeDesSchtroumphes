@@ -1,7 +1,7 @@
 <div class="produit-layout">
-  <!-- Partie gauche : image du produit avec sa quantité superposée -->
-  <div class="produit-image">
-    <img class="round" [src]="gameService.server() + '/' + prod()?.logo" [alt]="prod()?.name"/>
+  <!-- Partie gauche : image du produit avec sa quantité superposée (clic = lancer la production) -->
+  <div class="produit-image" (click)="startFabrication()">
+    <img class="round" [src]="gameService.server() + '/' + prod()?.logo" [alt]="prod()?.name" />
     <span class="quantite-badge">{{ prod()?.quantite }}</span>
   </div>
 
@@ -10,23 +10,18 @@
     <!-- Partie haute : barre de progression + gain -->
     <div class="produit-production" (click)="startFabrication()">
       <div class="progressbar">
-        <div class="fill" [style.width.%]="0"></div>
+        <div class="fill" [style.width.%]="progress()"></div>
       </div>
-      <span class="gain">
-        {{ (prod()?.revenu ?? 0) * (prod()?.quantite ?? 0) | bigvalue }}
-      </span>
+      <span class="gain" [innerHTML]="(prod()?.revenu ?? 0) * (prod()?.quantite ?? 0) | bigvalue"></span>
     </div>
 
     <!-- Partie basse : achat -->
     <div class="produit-achat">
       <div class="nom-produit">{{ prod()?.name }}</div>
-      <button
-        class="buy-button"
-        mat-raised-button
-        color="primary">
-        Buy x1 — {{ (prod()?.cout ?? 0) | bigvalue }}
+      <button class="buy-button" [disabled]="!canBuy()" (click)="acheter()">
+        Buy x{{ numberToBuy() }} — <span [innerHTML]="coutAchat() | bigvalue"></span>
       </button>
-      <span class="timeleft">{{ prod()?.timeleft }}</span>
+      <span class="timeleft">{{ timeleft() | second }}</span>
     </div>
   </div>
 </div>

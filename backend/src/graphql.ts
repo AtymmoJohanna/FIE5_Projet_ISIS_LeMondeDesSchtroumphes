@@ -46,7 +46,7 @@ export class World {
     totalangels: number;
     activeangels: number;
     angelbonus: number;
-    lastupdate: number;
+    lastupdate: string;
     products: Product[];
     allunlocks: Palier[];
     upgrades: Palier[];

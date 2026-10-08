@@ -9,20 +9,28 @@
   </div>
 
   <div class="qtmulti">
-    <button mat-raised-button color="primary">
-      x1
+    <button mat-raised-button color="primary" (click)="changeQtMulti()">
+      {{ qtmulti() }}
     </button>
   </div>
 
   <div class="userid">
     <span>Your ID :</span>
-    <input type="text" placeholder="pseudo" />
+    <!-- le champ est relié au formulaire du service ; Entrée = on change de joueur -->
+    <input
+      type="text"
+      placeholder="pseudo"
+      [formField]="gameService.loginForm.name"
+      (keydown.enter)="gameService.commitName()" />
+    <button class="refresh-button" (click)="gameService.refreshWorld()" title="Recharger le monde depuis le serveur">
+      ⟳
+    </button>
   </div>
 </div>
 
 <div class="main">
   <div class="menu">
-    <button mat-raised-button color="primary" class="actionb">
+    <button mat-raised-button color="primary" class="actionb" (click)="showUnlocks.set(true)">
       Unlocks
     </button>
     <button mat-raised-button color="primary" class="actionb">
@@ -31,7 +39,13 @@
     <button mat-raised-button color="primary" class="actionb">
       Angel Upgrades
     </button>
-    <button mat-raised-button color="primary" class="actionb">
+    <button
+      mat-raised-button
+      color="primary"
+      class="actionb"
+      [matBadge]="badgeManagers()"
+      [matBadgeHidden]="badgeManagers() == 0"
+      (click)="showManagers.set(true)">
       Managers
     </button>
     <button mat-raised-button color="primary" class="actionb">
@@ -43,8 +57,86 @@
     @for (product of world()?.products ?? []; track product.id) {
       <app-produit
         [prod]="product"
+        [qtmulti]="qtmulti()"
         class="product">
       </app-produit>
     }
   </div>
 </div>
+
+<!-- ============ FENÊTRE DES MANAGERS ============ -->
+@if (showManagers()) {
+  <!-- fond sombre derrière la fenêtre : un clic dessus ferme la fenêtre -->
+  <div class="modal-fond" (click)="showManagers.set(false)"></div>
+
+  <div class="modal">
+    <h1 class="modal-titre">Les Schtroumpfs managers</h1>
+    <p class="modal-sous-titre">Un manager fait tourner la production tout seul, même quand tu n'es pas là !</p>
+
+    @for (manager of world()?.managers ?? []; track manager.name) {
+      <!-- on n'affiche que les managers pas encore engagés -->
+      @if (!manager.unlocked) {
+        <div class="ligne-modal">
+          <img class="round" [src]="gameService.server() + '/' + manager.logo" [alt]="manager.name" />
+          <div class="ligne-infos">
+            <div class="ligne-nom">{{ manager.name }}</div>
+            <div class="ligne-cible">{{ nomProduit(manager.idcible) }}</div>
+            <div class="ligne-prix" [innerHTML]="manager.seuil | bigvalue"></div>
+          </div>
+          <button
+            class="hire-button"
+            [disabled]="(world()?.money ?? 0) < manager.seuil"
+            (click)="gameService.hireManager(manager)">
+            Hire !
+          </button>
+        </div>
+      }
+    }
+
+    <button mat-raised-button color="primary" class="close-button" (click)="showManagers.set(false)">
+      Close
+    </button>
+  </div>
+}
+
+<!-- ============ FENÊTRE DES UNLOCKS ============ -->
+@if (showUnlocks()) {
+  <div class="modal-fond" (click)="showUnlocks.set(false)"></div>
+
+  <div class="modal">
+    <h1 class="modal-titre">Les prochains bonus</h1>
+    <p class="modal-sous-titre">Atteins la quantité indiquée et le bonus se débloque tout seul !</p>
+
+    <!-- pour chaque produit : seulement son PROCHAIN unlock -->
+    @for (product of world()?.products ?? []; track product.id) {
+      @let palier = prochainUnlock(product);
+      @if (palier) {
+        <div class="ligne-modal">
+          <img class="round" [src]="gameService.server() + '/' + palier.logo" [alt]="palier.name" />
+          <div class="ligne-infos">
+            <div class="ligne-nom">{{ palier.name }}</div>
+            <div class="ligne-cible">{{ product.name }} : {{ product.quantite }} / {{ palier.seuil }}</div>
+          </div>
+          <div class="bonus">{{ gameService.texteBonus(palier) }}</div>
+        </div>
+      }
+    }
+
+    <!-- le prochain bonus global (tous les produits) -->
+    @let palierAll = prochainAllUnlock();
+    @if (palierAll) {
+      <div class="ligne-modal">
+        <img class="round" [src]="gameService.server() + '/' + palierAll.logo" [alt]="palierAll.name" />
+        <div class="ligne-infos">
+          <div class="ligne-nom">{{ palierAll.name }}</div>
+          <div class="ligne-cible">Tous les produits : {{ quantiteMin() }} / {{ palierAll.seuil }}</div>
+        </div>
+        <div class="bonus">{{ gameService.texteBonus(palierAll) }}</div>
+      </div>
+    }
+
+    <button mat-raised-button color="primary" class="close-button" (click)="showUnlocks.set(false)">
+      Close
+    </button>
+  </div>
+}

@@ -21,7 +21,7 @@ export type AcheterQtProduitMutationVariables = Exact<{
 }>;
 
 
-export type AcheterQtProduitMutationData = { acheterQtProduit: { id: number, name: string, logo: string, cout: number, croissance: number, revenu: number, vitesse: number, quantite: number, timeleft: number, managerUnlocked: boolean, paliers: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }> } | null };
+export type AcheterQtProduitMutationData = { acheterQtProduit: { id: number } | null };
 
 export type LancerProductionProduitMutationVariables = Exact<{
   user: string;
@@ -29,7 +29,7 @@ export type LancerProductionProduitMutationVariables = Exact<{
 }>;
 
 
-export type LancerProductionProduitMutationData = { lancerProductionProduit: { id: number, name: string, logo: string, cout: number, croissance: number, revenu: number, vitesse: number, quantite: number, timeleft: number, managerUnlocked: boolean, paliers: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }> } | null };
+export type LancerProductionProduitMutationData = { lancerProductionProduit: { id: number } | null };
 
 export type EngagerManagerMutationVariables = Exact<{
   user: string;
@@ -37,7 +37,7 @@ export type EngagerManagerMutationVariables = Exact<{
 }>;
 
 
-export type EngagerManagerMutationData = { engagerManager: { name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean } | null };
+export type EngagerManagerMutationData = { engagerManager: { name: string } | null };
 
 export type AcheterCashUpgradeMutationVariables = Exact<{
   user: string;
@@ -45,7 +45,7 @@ export type AcheterCashUpgradeMutationVariables = Exact<{
 }>;
 
 
-export type AcheterCashUpgradeMutationData = { acheterCashUpgrade: { name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean } | null };
+export type AcheterCashUpgradeMutationData = { acheterCashUpgrade: { name: string } | null };
 
 export type AcheterAngelUpgradeMutationVariables = Exact<{
   user: string;
@@ -53,14 +53,14 @@ export type AcheterAngelUpgradeMutationVariables = Exact<{
 }>;
 
 
-export type AcheterAngelUpgradeMutationData = { acheterAngelUpgrade: { name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean } | null };
+export type AcheterAngelUpgradeMutationData = { acheterAngelUpgrade: { name: string } | null };
 
 export type ResetWorldMutationVariables = Exact<{
   user: string;
 }>;
 
 
-export type ResetWorldMutationData = { resetWorld: { name: string, logo: string, money: number, score: number, totalangels: number, activeangels: number, angelbonus: number, lastupdate: number, products: Array<{ id: number, name: string, logo: string, cout: number, croissance: number, revenu: number, vitesse: number, quantite: number, timeleft: number, managerUnlocked: boolean, paliers: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }> }>, allunlocks: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }>, upgrades: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }>, angelupgrades: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }>, managers: Array<{ name: string, logo: string, seuil: number, idcible: number, ratio: number, typeratio: Types.RatioType, unlocked: boolean }> } | null };
+export type ResetWorldMutationData = { resetWorld: { name: string } | null };
 
 
 export const GET_WORLD_QUERY = gql`
@@ -148,24 +148,6 @@ export const ACHETER_QT_PRODUIT_MUTATION = gql`
     mutation AcheterQtProduit($user: String!, $id: Int!, $quantite: Int!) {
   acheterQtProduit(user: $user, id: $id, quantite: $quantite) {
     id
-    name
-    logo
-    cout
-    croissance
-    revenu
-    vitesse
-    quantite
-    timeleft
-    managerUnlocked
-    paliers {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
   }
 }
     ` as DocumentNode<AcheterQtProduitMutationData, AcheterQtProduitMutationVariables>;
@@ -181,24 +163,6 @@ export const LANCER_PRODUCTION_PRODUIT_MUTATION = gql`
     mutation LancerProductionProduit($user: String!, $id: Int!) {
   lancerProductionProduit(user: $user, id: $id) {
     id
-    name
-    logo
-    cout
-    croissance
-    revenu
-    vitesse
-    quantite
-    timeleft
-    managerUnlocked
-    paliers {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
   }
 }
     ` as DocumentNode<LancerProductionProduitMutationData, LancerProductionProduitMutationVariables>;
@@ -214,12 +178,6 @@ export const ENGAGER_MANAGER_MUTATION = gql`
     mutation EngagerManager($user: String!, $name: String!) {
   engagerManager(user: $user, name: $name) {
     name
-    logo
-    seuil
-    idcible
-    ratio
-    typeratio
-    unlocked
   }
 }
     ` as DocumentNode<EngagerManagerMutationData, EngagerManagerMutationVariables>;
@@ -235,12 +193,6 @@ export const ACHETER_CASH_UPGRADE_MUTATION = gql`
     mutation AcheterCashUpgrade($user: String!, $name: String!) {
   acheterCashUpgrade(user: $user, name: $name) {
     name
-    logo
-    seuil
-    idcible
-    ratio
-    typeratio
-    unlocked
   }
 }
     ` as DocumentNode<AcheterCashUpgradeMutationData, AcheterCashUpgradeMutationVariables>;
@@ -256,12 +208,6 @@ export const ACHETER_ANGEL_UPGRADE_MUTATION = gql`
     mutation AcheterAngelUpgrade($user: String!, $name: String!) {
   acheterAngelUpgrade(user: $user, name: $name) {
     name
-    logo
-    seuil
-    idcible
-    ratio
-    typeratio
-    unlocked
   }
 }
     ` as DocumentNode<AcheterAngelUpgradeMutationData, AcheterAngelUpgradeMutationVariables>;
@@ -277,70 +223,6 @@ export const RESET_WORLD_MUTATION = gql`
     mutation ResetWorld($user: String!) {
   resetWorld(user: $user) {
     name
-    logo
-    money
-    score
-    totalangels
-    activeangels
-    angelbonus
-    lastupdate
-    products {
-      id
-      name
-      logo
-      cout
-      croissance
-      revenu
-      vitesse
-      quantite
-      timeleft
-      managerUnlocked
-      paliers {
-        name
-        logo
-        seuil
-        idcible
-        ratio
-        typeratio
-        unlocked
-      }
-    }
-    allunlocks {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
-    upgrades {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
-    angelupgrades {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
-    managers {
-      name
-      logo
-      seuil
-      idcible
-      ratio
-      typeratio
-      unlocked
-    }
   }
 }
     ` as DocumentNode<ResetWorldMutationData, ResetWorldMutationVariables>;

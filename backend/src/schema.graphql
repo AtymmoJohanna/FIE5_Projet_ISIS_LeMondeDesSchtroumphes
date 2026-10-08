@@ -33,7 +33,7 @@ type World {
   totalangels: Int!
   activeangels: Int!
   angelbonus: Int!
-  lastupdate: Int!
+  lastupdate: String!    # avant : Int!
   products: [Product!]!
   allunlocks: [Palier!]!
   upgrades: [Palier!]!

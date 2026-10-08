@@ -148,6 +148,25 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
+.refresh-button {
+    width: 38px;
+    height: 38px;
+
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+
+    background: #ffd83d;
+    color: #684d00;
+    border: 2px solid white;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.refresh-button:hover {
+    background: #ffe66a;
+}
+
 .userid input:focus {
     border-color: #ffd83d;
     box-shadow: 0 0 0 3px rgba(255, 216, 61, 0.35);
@@ -318,4 +337,118 @@ button[mat-raised-button]:active {
     .products {
         padding: 12px;
     }
+}
+
+/* FENÊTRES (MODALES) : managers, unlocks, upgrades... */
+
+/* fond sombre qui couvre toute la page */
+.modal-fond {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left = 0 : tout l'écran */
+    z-index: 20;
+    background: rgba(20, 50, 80, 0.45);
+}
+
+/* la fenêtre elle-même, centrée à l'écran */
+.modal {
+    position: fixed;
+    z-index: 21; /* au-dessus du fond */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: min(640px, 92vw);
+    max-height: 80vh;
+    overflow-y: auto; /* barre de scroll si la liste est longue */
+
+    padding: 24px;
+
+    background: #ffffff;
+    border: 4px solid #a9e2f8;
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-titre {
+    margin: 0 0 4px;
+    color: #126da7;
+    font-size: 1.6rem;
+    font-weight: 900;
+}
+
+.modal-sous-titre {
+    margin: 0 0 18px;
+    color: #4f7d95;
+}
+
+/* une ligne = image + infos + bouton */
+.ligne-modal {
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    align-items: center;
+    gap: 16px;
+
+    padding: 10px 0;
+    border-bottom: 2px dashed #d3ecf5;
+}
+
+.ligne-modal .round {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #a9e2f8;
+}
+
+.ligne-nom {
+    font-weight: 900;
+    color: #155d82;
+}
+
+.ligne-cible {
+    font-size: 0.9rem;
+    color: #4f7d95;
+}
+
+.ligne-prix {
+    font-weight: bold;
+    color: #725b00;
+}
+
+/* bouton jaune "Hire !" / "Buy !" */
+.hire-button {
+    padding: 8px 18px;
+    font-family: inherit;
+    font-weight: 900;
+    cursor: pointer;
+
+    background: #ffd83d;
+    color: #614d00;
+    border: 3px solid #fff0a0;
+    border-radius: 13px;
+    box-shadow: 0 4px 0 #d7ad22;
+}
+
+.hire-button:disabled {
+    background: #e3e8eb;
+    color: #9aa7ae;
+    border-color: #f1f4f5;
+    box-shadow: 0 4px 0 #c5cdd1;
+    cursor: not-allowed;
+}
+
+/* étiquette verte "Vitesse x2" / "Gain x3" */
+.bonus {
+    padding: 6px 12px;
+    font-weight: 900;
+    color: #1d6b2f;
+    background: #dcf7e2;
+    border: 2px solid #9fe0ae;
+    border-radius: 12px;
+    white-space: nowrap;
+}
+
+.close-button {
+    display: block;
+    margin: 18px auto 0;
 }
