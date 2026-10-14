@@ -68,7 +68,13 @@ export class GameService {
   world = linkedSignal(() => this.worldQuery.data()?.getWorld);
 
   // message à afficher au joueur (le composant app l'affiche dans une snackbar dès qu'il change)
-  snackmessage = signal('');
+  // message à afficher au joueur (le composant app l'affiche dans une snackbar)
+  snackmessage = signal<{ text: string; icon: string }>({ text: '', icon: '' });
+
+  notify(text: string, icon: string) {
+    // on crée un nouvel objet à chaque fois : même deux messages identiques de suite s'afficheront
+    this.snackmessage.set({ text, icon });
+  }
 
   // ---------------------------------------------------------------
   // PRODUCTION
@@ -178,7 +184,7 @@ export class GameService {
     }
 
     if (debloques.length > 0) {
-      this.snackmessage.set('🔓 Bonus débloqué : ' + debloques.join(', '));
+      this.notify('Bonus débloqué : ' + debloques.join(', '), 'bonus');
     }
   }
 
@@ -213,7 +219,7 @@ export class GameService {
       products: newproducts,
     });
 
-    this.snackmessage.set(manager.name + ' a été engagé !');
+    this.notify(manager.name + ' a été engagé !', 'manager');
     this.engagerManagerGraphQL(manager.name);
   }
 
@@ -228,7 +234,7 @@ export class GameService {
         variables: { user: this.user(), id, quantite: qt },
       });
     } catch (error) {
-      this.snackmessage.set("Erreur serveur : l'achat n'a pas été enregistré");
+      this.notify("Erreur serveur : l'achat n'a pas été enregistré", 'erreur');
       this.refreshWorld(); // le serveur fait foi : on recharge son monde pour être à nouveau d'accord avec lui
     }
   }
@@ -241,7 +247,7 @@ export class GameService {
         variables: { user: this.user(), name },
       });
     } catch (error) {
-      this.snackmessage.set("Erreur serveur : le manager n'a pas pu être engagé");
+      this.notify("Erreur serveur : le manager n'a pas pu être engagé", 'erreur');
       this.refreshWorld(); // le serveur fait foi : on recharge son monde pour être à nouveau d'accord avec lui
     }
   }
@@ -256,7 +262,7 @@ export class GameService {
         variables: { user: this.user(), id },
       });
     } catch (error) {
-      this.snackmessage.set("Erreur serveur : la production n'a pas été enregistrée");
+      this.notify("Erreur serveur : la production n'a pas été enregistrée", 'erreur');
       this.refreshWorld(); // le serveur fait foi : on recharge son monde pour être à nouveau d'accord avec lui
     }
   }

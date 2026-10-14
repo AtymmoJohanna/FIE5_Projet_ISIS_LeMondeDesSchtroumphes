@@ -23,8 +23,13 @@ export class App {
     // dès que gameService.snackmessage change, on affiche le message
     effect(() => {
       const message = this.gameService.snackmessage();
-      if (message !== '') {
-        this.snackBar.open(message, 'ok', { duration: 2000 });
+      if (message.text !== '') {
+        this.snackBar.open(message.text, 'OK', {
+          duration: 2500,
+          panelClass: ['game-snack', 'snack-' + message.icon],
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
       }
     });
   }
