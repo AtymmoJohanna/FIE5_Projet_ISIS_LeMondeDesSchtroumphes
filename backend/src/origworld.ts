@@ -1,322 +1,321 @@
 import { RatioType } from './graphql.js';
 export const origworld = {
-    name: 'Schtroumpf World 1',
-    logo: 'icones/Schtroumpf_World_1.png',
+    name: "Schtroumpf World 1",
+    logo: "icones/Schtroumpf_World_1.png",
     money: 0,
     score: 0,
     totalangels: 0,
     activeangels: 0,
     angelbonus: 2,
-    lastupdate: '0',
+    lastupdate: "0",
     products: [
-{
-    id: 1,
-    name: "Cueillette de Salsepareille",
-    logo: "icones/salsepareille.png",
-    cout: 4,
-    croissance: 1.07,
-    revenu: 1,
-    vitesse: 500,
-    quantite: 1,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "La forêt regorge de salsepareille !",
-        logo: "icones/salsepareille.png",
-        seuil: 20,
-        idcible: -1,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "N'oublie pas ton panier !",
-        logo: "icones/salsepareille.png",
-        seuil: 75,
-        idcible: 1,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Atelier de Schtroumpf Bricoleur",
-    logo: "icones/atelierbricoleur.png",
-    cout: 60,
-    croissance: 1.07,
-    revenu: 15,
-    vitesse: 1000,
-    quantite: 0,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "Outils bien huilés",
-        logo: "icones/atelierbricoleur.png",
-        seuil: 20,
-        idcible: 2,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "Établi renforcé",
-        logo: "icones/atelierbricoleur.png",
-        seuil: 75,
-        idcible: 2,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Potager Schtroumpf",
-    logo: "icones/potager.png",
-    cout: 720,
-    croissance: 1.07,
-    revenu: 180,
-    vitesse: 2000,
-    quantite: 0,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "Légumes bleus bien mûrs",
-        logo: "icones/potager.png",
-        seuil: 20,
-        idcible: 3,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "Arrosage magique",
-        logo: "icones/potager.png",
-        seuil: 75,
-        idcible: 3,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: "Laboratoire de Grand Schtroumpf",
-    logo: "icones/laboratoire.png",
-    cout: 8640,
-    croissance: 1.07,
-    revenu: 2160,
-    vitesse: 4000,
-    quantite: 0,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "Chaudron optimisé",
-        logo: "icones/laboratoire.png",
-        seuil: 20,
-        idcible: 4,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "Grimoire de potions avancées",
-        logo: "icones/laboratoire.png",
-        seuil: 75,
-        idcible: 4,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: "Bibliothèque du Savoir",
-    logo: "icones/bibliotheque.png",
-    cout: 103680,
-    croissance: 1.07,
-    revenu: 25920,
-    vitesse: 8000,
-    quantite: 0,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "Étagères agrandies",
-        logo: "icones/bibliotheque.png",
-        seuil: 20,
-        idcible: 5,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "Lunettes de lecture rapide",
-        logo: "icones/bibliotheque.png",
-        seuil: 75,
-        idcible: 5,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-  {
-    id: 6,
-    name: "Portail Dimensionnel",
-    logo: "icones/portail.png",
-    cout: 1244160,
-    croissance: 1.07,
-    revenu: 311040,
-    vitesse: 16000,
-    quantite: 0,
-    timeleft: 0,
-    managerUnlocked: false,
-    paliers: [
-      {
-        name: "Portail stabilisé",
-        logo: "icones/portail.png",
-        seuil: 20,
-        idcible: 6,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-      {
-        name: "Sortilège de Homnibus",
-        logo: "icones/portail.png",
-        seuil: 75,
-        idcible: 6,
-        ratio: 2,
-        typeratio: RatioType.vitesse,
-        unlocked: false,
-      },
-    ],
-  },
-
+        {
+            id: 1,
+            name: "Cueillette de Salsepareille",
+            logo: "icones/salsepareille.png",
+            cout: 4,
+            croissance: 1.07,
+            revenu: 1,
+            vitesse: 500,
+            quantite: 1,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "La forêt regorge de salsepareille !",
+                    logo: "icones/salsepareille.png",
+                    seuil: 25,
+                    idcible: 1,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "N'oublie pas ton panier !",
+                    logo: "icones/salsepareille.png",
+                    seuil: 50,
+                    idcible: 1,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        },
+        {
+            id: 2,
+            name: "Atelier de Schtroumpf Bricoleur",
+            logo: "icones/atelierbricoleur.png",
+            cout: 60,
+            croissance: 1.15,
+            revenu: 60,
+            vitesse: 3000,
+            quantite: 0,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "Outils bien huilés",
+                    logo: "icones/atelierbricoleur.png",
+                    seuil: 25,
+                    idcible: 2,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "Établi renforcé",
+                    logo: "icones/atelierbricoleur.png",
+                    seuil: 50,
+                    idcible: 2,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        },
+        {
+            id: 3,
+            name: "Potager Schtroumpf",
+            logo: "icones/potager.png",
+            cout: 720,
+            croissance: 1.14,
+            revenu: 540,
+            vitesse: 6000,
+            quantite: 0,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "Légumes bleus bien mûrs",
+                    logo: "icones/potager.png",
+                    seuil: 25,
+                    idcible: 3,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "Arrosage magique",
+                    logo: "icones/potager.png",
+                    seuil: 50,
+                    idcible: 3,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        },
+        {
+            id: 4,
+            name: "Laboratoire de Grand Schtroumpf",
+            logo: "icones/laboratoire.png",
+            cout: 8640,
+            croissance: 1.13,
+            revenu: 4320,
+            vitesse: 12000,
+            quantite: 0,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "Chaudron optimisé",
+                    logo: "icones/laboratoire.png",
+                    seuil: 25,
+                    idcible: 4,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "Grimoire de potions avancées",
+                    logo: "icones/laboratoire.png",
+                    seuil: 50,
+                    idcible: 4,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        },
+        {
+            id: 5,
+            name: "Bibliothèque du Savoir",
+            logo: "icones/bibliotheque.png",
+            cout: 103680,
+            croissance: 1.12,
+            revenu: 51840,
+            vitesse: 24000,
+            quantite: 0,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "Étagères agrandies",
+                    logo: "icones/bibliotheque.png",
+                    seuil: 25,
+                    idcible: 5,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "Lunettes de lecture rapide",
+                    logo: "icones/bibliotheque.png",
+                    seuil: 50,
+                    idcible: 5,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        },
+        {
+            id: 6,
+            name: "Portail Dimensionnel",
+            logo: "icones/portail.png",
+            cout: 1244160,
+            croissance: 1.11,
+            revenu: 622080,
+            vitesse: 96000,
+            quantite: 0,
+            timeleft: 0,
+            managerUnlocked: false,
+            paliers: [
+                {
+                    name: "Portail stabilisé",
+                    logo: "icones/portail.png",
+                    seuil: 25,
+                    idcible: 6,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                },
+                {
+                    name: "Sortilège de Homnibus",
+                    logo: "icones/portail.png",
+                    seuil: 50,
+                    idcible: 6,
+                    ratio: 2,
+                    typeratio: RatioType.vitesse,
+                    unlocked: false
+                }
+            ]
+        }
     ],
     allunlocks: [
         {
-            name: 'All is better than one',
-            logo: 'icones/all.png',
-            seuil: 30,
+            name: "All is better than one",
+            logo: "icones/all.png",
+            seuil: 50,
             idcible: 0,
             ratio: 2,
             typeratio: RatioType.gain,
-            unlocked: false,
+            unlocked: false
         },
         {
-            name: 'To take and not to give',
-            logo: 'icones/all.png',
+            name: "To take and not to give",
+            logo: "icones/all.png",
             seuil: 150,
             idcible: 0,
             ratio: 3,
             typeratio: RatioType.gain,
-            unlocked: false,
+            unlocked: false
         }
     ],
     upgrades: [
         {
-            name: 'Do you like paper bag ?',
-            logo: 'icones/sacpapier.png',
+            name: "Do you like paper bag ?",
+            logo: "icones/sacpapier.png",
             seuil: 1000,
             idcible: 1,
             ratio: 3,
             typeratio: RatioType.gain,
-            unlocked: false,
+            unlocked: false
         },
         {
-            name: 'This is my bin',
-            logo: 'icones/recyclage.png',
+            name: "This is my bin",
+            logo: "icones/recyclage.png",
             seuil: 15000,
             idcible: 2,
             ratio: 3,
             typeratio: RatioType.gain,
-            unlocked: false,
-        },
+            unlocked: false
+        }
     ],
     angelupgrades: [
         {
-            name: 'Angel Sacrifice',
-            logo: 'icones/angel.png',
+            name: "Angel Sacrifice",
+            logo: "icones/angel.png",
             seuil: 10,
             idcible: 0,
             ratio: 3,
             typeratio: RatioType.gain,
-            unlocked: false,
+            unlocked: false
         },
         {
-            name: 'Angelic Mutiny',
-            logo: 'icones/angel.png',
-            seuil: 100000,
+            name: "Angelic Mutiny",
+            logo: "icones/angel.png",
+            seuil: 100,
             idcible: 1,
             ratio: 2,
             typeratio: RatioType.ange,
-            unlocked: false,
-        },
+            unlocked: false
+        }
     ],
-   managers: [
-    {
-        name: 'Schtroumpf Costaud',
-        logo: 'icones/schtroumpfcostaud.png',
-        seuil: 10,
-        idcible: 1,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-    {
-        name: 'Schtroumpf Bricoleur',
-        logo: 'icones/schtroumpfbricoleur.png',
-        seuil: 15000,
-        idcible: 2,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-    {
-        name: 'Schtroumpf Jardinier',
-        logo: 'icones/schtroumpfjardinier.png',
-        seuil: 200000,
-        idcible: 3,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-    {
-        name: 'Grand Schtroumpf',
-        logo: 'icones/grandschtroumpf.png',
-        seuil: 2500000,
-        idcible: 4,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-    {
-        name: 'Schtroumpf à Lunettes',
-        logo: 'icones/schtroumpfalunettes.png',
-        seuil: 35000000,
-        idcible: 5,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-    {
-        name: 'Homnibus',
-        logo: 'icones/homnibus.png',
-        seuil: 450000000,
-        idcible: 6,
-        ratio: 0,
-        typeratio: RatioType.gain,
-        unlocked: false,
-    },
-],
+    managers: [
+        {
+            name: "Schtroumpf Costaud",
+            logo: "icones/schtroumpfcostaud.png",
+            seuil: 1000,
+            idcible: 1,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        },
+        {
+            name: "Schtroumpf Bricoleur",
+            logo: "icones/schtroumpfbricoleur.png",
+            seuil: 15000,
+            idcible: 2,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        },
+        {
+            name: "Schtroumpf Jardinier",
+            logo: "icones/schtroumpfjardinier.png",
+            seuil: 100000,
+            idcible: 3,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        },
+        {
+            name: "Grand Schtroumpf",
+            logo: "icones/grandschtroumpf.png",
+            seuil: 500000,
+            idcible: 4,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        },
+        {
+            name: "Schtroumpf à Lunettes",
+            logo: "icones/schtroumpfalunettes.png",
+            seuil: 1200000,
+            idcible: 5,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        },
+        {
+            name: "Homnibus",
+            logo: "icones/homnibus.png",
+            seuil: 10000000,
+            idcible: 6,
+            ratio: 0,
+            typeratio: RatioType.gain,
+            unlocked: false
+        }
+    ]
 };

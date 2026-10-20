@@ -1,4 +1,4 @@
-import { Service, inject, signal, linkedSignal } from '@angular/core';
+import { Service, inject, signal, linkedSignal, computed } from '@angular/core';
 import { form } from '@angular/forms/signals';
 import { Apollo } from '@apollo-orbit/angular';
 import {
@@ -6,6 +6,9 @@ import {
   ENGAGER_MANAGER_MUTATION,
   GET_WORLD_QUERY,
   LANCER_PRODUCTION_PRODUIT_MUTATION,
+  ACHETER_CASH_UPGRADE_MUTATION,
+  RESET_WORLD_MUTATION,
+  ACHETER_ANGEL_UPGRADE_MUTATION,
   Palier,
   Product,
   RatioType,
@@ -23,6 +26,7 @@ export class GameService {
 
   user = signal('');
   server = signal('http://localhost:3000');
+  //server = signal('https://capitalist.lucaslopvet.fr');
 
   // ---------------------------------------------------------------
   // LE PSEUDO DU JOUEUR
@@ -64,10 +68,15 @@ export class GameService {
     variables: () => ({ user: this.user() }),
     fetchPolicy: 'network-only', // toujours demander au serveur (jamais une vieille copie en cache)
   });
+
   // le monde : copie modifiable du résultat de la requête
   world = linkedSignal(() => this.worldQuery.data()?.getWorld);
 
-  // message à afficher au joueur (le composant app l'affiche dans une snackbar dès qu'il change)
+  angelMultiplier = computed(() => {
+    const world = this.world();
+    return world ? 1 + (world.activeangels * world.angelbonus) / 100 : 1;
+  });
+
   // message à afficher au joueur (le composant app l'affiche dans une snackbar)
   snackmessage = signal<{ text: string; icon: string }>({ text: '', icon: '' });
 
@@ -83,9 +92,7 @@ export class GameService {
   productionDone(prod: Product, qt: number) {
     this.world.update((world) => {
       if (!world) return world;
-      // bonus des anges : chaque ange actif rapporte angelbonus % (2% au départ)
-      const angelBonus = 1 + (world.activeangels * world.angelbonus) / 100;
-      const gain = prod.revenu * prod.quantite * qt * angelBonus;
+      const gain = prod.revenu * prod.quantite * qt * this.angelMultiplier();
       // on renvoie un NOUVEAU monde (copie de l'ancien) avec money et score mis à jour
       return { ...world, money: world.money + gain, score: world.score + gain };
     });
@@ -154,6 +161,7 @@ export class GameService {
     for (const p of cibles) {
       if (palier.typeratio === RatioType.Vitesse) {
         p.vitesse = Math.floor(p.vitesse / palier.ratio); // produit plus vite
+        p.timeleft = Math.floor(p.timeleft / palier.ratio); // la production en cours accélère aussi
       } else if (palier.typeratio === RatioType.Gain) {
         p.revenu = p.revenu * palier.ratio; // rapporte plus
       }
@@ -221,6 +229,101 @@ export class GameService {
 
     this.notify(manager.name + ' a été engagé !', 'manager');
     this.engagerManagerGraphQL(manager.name);
+  }
+
+  // ---------------------------------------------------------------
+  // CASH UPGRADES
+  // ---------------------------------------------------------------
+  buyUpgrade(upgrade: Palier) {
+    const world = this.world();
+    if (!world) return;
+    if (upgrade.unlocked) return; // déjà acheté
+    if (world.money < upgrade.seuil) return; // pas assez d'argent
+
+    const newworld = structuredClone(world);
+    const up = newworld.upgrades.find((u) => u.name === upgrade.name);
+    if (!up) return;
+
+    newworld.money -= up.seuil;
+    up.unlocked = true;
+    this.appliquerBonus(newworld, up);
+
+    this.world.set(newworld);
+    this.notify(up.name + ' acheté !', 'bonus');
+    this.acheterUpgradeGraphQL(up.name);
+  }
+
+  readonly acheterUpgradeMutation = this.apollo.signal.mutation(ACHETER_CASH_UPGRADE_MUTATION);
+
+  async acheterUpgradeGraphQL(name: string) {
+    try {
+      await this.acheterUpgradeMutation.mutate({
+        variables: { user: this.user(), name },
+      });
+    } catch (error) {
+      this.notify("Erreur serveur : l'upgrade n'a pas été enregistré", 'erreur');
+      this.refreshWorld();
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // ANGES / INVESTORS
+  // ---------------------------------------------------------------
+  // anges supplémentaires gagnés par la partie en cours (même formule que le backend)
+  angesSupplementaires(world: World): number {
+    const total = Math.floor(150 * Math.sqrt(world.score / Math.pow(10, 15)));
+    return Math.max(0, total - world.totalangels);
+  }
+
+  readonly resetWorldMutation = this.apollo.signal.mutation(RESET_WORLD_MUTATION);
+
+  async resetWorldGraphQL() {
+    try {
+      await this.resetWorldMutation.mutate({
+        variables: { user: this.user() },
+      });
+      this.refreshWorld(); // on récupère le monde remis à zéro par le serveur
+      this.notify('Nouvelle partie ! Tes anges sont actifs', 'bonus');
+    } catch (error) {
+      this.notify('Erreur serveur : la remise à zéro a échoué', 'erreur');
+    }
+  }
+
+    // ---------------------------------------------------------------
+  // ANGEL UPGRADES
+  // ---------------------------------------------------------------
+  buyAngelUpgrade(upgrade: Palier) {
+    const world = this.world();
+    if (!world) return;
+    if (upgrade.unlocked) return; // déjà acheté
+    if (world.activeangels < upgrade.seuil) return; // pas assez d'anges
+
+    const newworld = structuredClone(world);
+    const up = newworld.angelupgrades.find((u) => u.name === upgrade.name);
+    if (!up) return;
+
+    newworld.activeangels -= up.seuil; // pour un angel upgrade, "seuil" est un nombre d'anges
+    up.unlocked = true;
+    this.appliquerBonus(newworld, up); // gain, vitesse ou ange, comme les autres bonus
+
+    this.world.set(newworld);
+    this.notify(up.name + ' acheté !', 'bonus');
+    this.acheterAngelUpgradeGraphQL(up.name);
+  }
+
+  readonly acheterAngelUpgradeMutation = this.apollo.signal.mutation(
+    ACHETER_ANGEL_UPGRADE_MUTATION,
+  );
+
+  async acheterAngelUpgradeGraphQL(name: string) {
+    try {
+      await this.acheterAngelUpgradeMutation.mutate({
+        variables: { user: this.user(), name },
+      });
+    } catch (error) {
+      this.notify("Erreur serveur : l'angel upgrade n'a pas été enregistré", 'erreur');
+      this.refreshWorld();
+    }
   }
 
   // ---------------------------------------------------------------

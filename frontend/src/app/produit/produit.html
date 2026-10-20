@@ -12,7 +12,9 @@
       <div class="progressbar">
         <div class="fill" [style.width.%]="progress()"></div>
       </div>
-      <span class="gain" [innerHTML]="(prod()?.revenu ?? 0) * (prod()?.quantite ?? 0) | bigvalue"></span>
+      <span class="gain">
+        {{ (prod()?.revenu ?? 0) * (prod()?.quantite ?? 0) * gameService.angelMultiplier() | bigvalue }}
+      </span>
     </div>
 
     <!-- Partie basse : achat -->

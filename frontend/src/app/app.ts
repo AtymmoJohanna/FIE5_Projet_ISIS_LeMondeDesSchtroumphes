@@ -85,4 +85,54 @@ export class App {
     if (!world) return 0;
     return Math.min(...world.products.map((p) => p.quantite));
   });
+
+    // ---------------------------------------------------------------
+  // CASH UPGRADES
+  // ---------------------------------------------------------------
+  showUpgrades = signal(false);
+
+  // nombre d'upgrades achetables maintenant (badge du bouton)
+  badgeUpgrades = computed(() => {
+    const world = this.world();
+    if (!world) return 0;
+    return world.upgrades.filter((u) => !u.unlocked && world.money >= u.seuil).length;
+  });
+
+  // les 5 prochains upgrades pas encore achetés
+  prochainsUpgrades = computed(
+    () => this.world()?.upgrades.filter((u) => !u.unlocked).slice(0, 5) ?? [],
+  );
+
+    // ---------------------------------------------------------------
+  // INVESTORS (ANGES)
+  // ---------------------------------------------------------------
+  showInvestors = signal(false);
+
+  // anges qu'on gagnerait en remettant la partie à zéro maintenant
+  angesGagnes = computed(() => {
+    const world = this.world();
+    return world ? this.gameService.angesSupplementaires(world) : 0;
+  });
+
+  // reset : on prévient le serveur, puis on ferme la fenêtre
+  async reset() {
+    await this.gameService.resetWorldGraphQL();
+    this.showInvestors.set(false);
+  }
+    // ---------------------------------------------------------------
+  // ANGEL UPGRADES
+  // ---------------------------------------------------------------
+  showAngelUpgrades = signal(false);
+
+  // nombre d'angel upgrades achetables avec les anges actifs (badge du bouton)
+  badgeAngelUpgrades = computed(() => {
+    const world = this.world();
+    if (!world) return 0;
+    return world.angelupgrades.filter((u) => !u.unlocked && world.activeangels >= u.seuil).length;
+  });
+
+  // les 5 prochains angel upgrades pas encore achetés
+  prochainsAngelUpgrades = computed(
+    () => this.world()?.angelupgrades.filter((u) => !u.unlocked).slice(0, 5) ?? [],
+  );
 }
