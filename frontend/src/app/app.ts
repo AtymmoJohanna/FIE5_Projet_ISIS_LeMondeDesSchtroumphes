@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormField } from '@angular/forms/signals';
 import { GameService } from './game-service';
 import { Product } from './graphql';
+import { AudioService } from './audio-service';
 
 @Component({
   imports: [BigvaluePipe, Produit, MatBadge, MatButton, FormField],
@@ -135,4 +136,25 @@ export class App {
   prochainsAngelUpgrades = computed(
     () => this.world()?.angelupgrades.filter((u) => !u.unlocked).slice(0, 5) ?? [],
   );
+
+    // ---------------------------------------------------------------
+  // PAGE DE DÉMARRAGE, MUSIQUE ET CONFETTIS
+  // ---------------------------------------------------------------
+  audio = inject(AudioService);
+
+  // la page d'accueil reste affichée tant que le joueur n'a pas cliqué sur "Jouer"
+  started = signal(false);
+
+  demarrer() {
+    this.audio.demarrer(); // le clic autorise le son, la musique démarre
+    this.started.set(true);
+  }
+
+  // 40 morceaux de confettis, avec une position, une couleur et une vitesse aléatoires
+  confettiPieces = Array.from({ length: 40 }, (_, i) => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 0.4,
+    duree: 1.6 + Math.random() * 1.2,
+    couleur: ['#ffd83d', '#ad16d2', '#2da9e9', '#ff6b6b', '#6bd66b'][i % 5],
+  }));
 }

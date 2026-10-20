@@ -9,6 +9,8 @@
 
   padding: 14px 18px;
 
+  position: relative;
+
   background:
     linear-gradient(
       135deg,
@@ -350,4 +352,24 @@
   .timeleft {
     width: 100%;
   }
+}
+/* texte qui s'envole à l'achat */
+.flottant {
+  position: absolute;
+  left: 60px;
+  top: 20px;
+  z-index: 5;
+  pointer-events: none;
+
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #ffd83d;
+  text-shadow: 0 2px 0 #725b00, 0 0 8px rgba(255, 216, 61, 0.8);
+
+  animation: monte 1.1s ease-out forwards;
+}
+
+@keyframes monte {
+  from { opacity: 1; transform: translateY(0) scale(0.8); }
+  to   { opacity: 0; transform: translateY(-60px) scale(1.4); }
 }

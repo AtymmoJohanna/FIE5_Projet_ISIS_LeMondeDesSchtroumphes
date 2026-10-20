@@ -1,3 +1,31 @@
+<!-- ============ PAGE DE DÉMARRAGE ============ -->
+@if (!started()) {
+<div class="accueil">
+  <div class="accueil-carte">
+    @if (world(); as w) {
+    <img class="round accueil-logo" [src]="gameService.server() + '/' + w.logo" [alt]="w.name" />
+    <h1 class="accueil-titre">{{ w.name }}</h1>
+    }
+    <p class="accueil-texte">Bienvenue, {{ gameService.user() }} !</p>
+    <button class="hire-button accueil-bouton" [disabled]="!world()" (click)="demarrer()">
+      Jouer !
+    </button>
+  </div>
+</div>
+}
+
+<!-- ============ CONFETTIS ============ -->
+@if (gameService.confetti() > 0) {
+@for (k of [gameService.confetti()]; track k) {
+<div class="confettis">
+  @for (c of confettiPieces; track $index) {
+  <span class="confetti" [style.left.%]="c.left" [style.background]="c.couleur" [style.animation-delay.s]="c.delay"
+    [style.animation-duration.s]="c.duree"></span>
+  }
+</div>
+}
+}
+
 <div class="header">
   <div class="world-info">
     <img class="round" [src]="gameService.server() + '/' + world()?.logo" />
@@ -19,6 +47,10 @@
     <!-- le champ est relié au formulaire du service ; Entrée = on change de joueur -->
     <input type="text" placeholder="pseudo" [formField]="gameService.loginForm.name"
       (keydown.enter)="gameService.commitName()" />
+    <button class="refresh-button bouton-son" (click)="audio.toggleMute()" title="Activer / couper le son">
+      <img [src]="audio.muted() ? '/images/pas_son.png' : '/images/son.png'"
+        [alt]="audio.muted() ? 'Son coupé' : 'Son activé'" />
+    </button>
     <button class="refresh-button" (click)="gameService.refreshWorld()" title="Recharger le monde depuis le serveur">
       ⟳
     </button>
@@ -45,6 +77,13 @@
     <button mat-raised-button color="primary" class="actionb" (click)="showInvestors.set(true)">
       Investors
     </button>
+    <div class="serveur">
+      <select (change)="gameService.changerServeur($any($event.target).value)">
+        @for (s of gameService.serveurs; track s.url) {
+        <option [value]="s.url" [selected]="s.url === gameService.server()">{{ s.nom }}</option>
+        }
+      </select>
+    </div>
   </div>
 
   <div class="products">

@@ -1,4 +1,6 @@
 import { Service, inject, signal, linkedSignal, computed } from '@angular/core';
+import { AudioService } from './audio-service';
+import { SERVEURS, serverUrl } from './server-config';
 import { form } from '@angular/forms/signals';
 import { Apollo } from '@apollo-orbit/angular';
 import {
@@ -23,10 +25,11 @@ interface UserLogin {
 @Service()
 export class GameService {
   private readonly apollo = inject(Apollo);
+  private readonly audio = inject(AudioService);
 
   user = signal('');
-  server = signal('http://localhost:3000');
-  //server = signal('https://capitalist.lucaslopvet.fr');
+  server = serverUrl; // adresse du backend (partagée avec la config Apollo)
+  serveurs = SERVEURS; // les choix du menu backend
 
   // ---------------------------------------------------------------
   // LE PSEUDO DU JOUEUR
@@ -83,6 +86,32 @@ export class GameService {
   notify(text: string, icon: string) {
     // on crée un nouvel objet à chaque fois : même deux messages identiques de suite s'afficheront
     this.snackmessage.set({ text, icon });
+    this.audio.jouer(icon); // le son dépend du type : bonus, manager, erreur
+    if (icon === 'bonus' || icon === 'manager') this.confetti.update((n) => n + 1);
+  }
+
+  // compteur de confettis : chaque changement relance l'animation
+  confetti = signal(0);
+
+  // textes qui s'envolent au-dessus d'un produit (ex : "+10" à l'achat)
+  flottants = signal<{ n: number; id: number; text: string }[]>([]);
+  private compteurFlottants = 0;
+
+  ajouterFlottant(id: number, text: string) {
+    const n = ++this.compteurFlottants;
+    this.flottants.update((liste) => [...liste, { n, id, text }]);
+    setTimeout(() => this.flottants.update((liste) => liste.filter((f) => f.n !== n)), 1200);
+  }
+
+    // appelée quand le joueur choisit un autre backend dans le menu
+  async changerServeur(url: string) {
+    localStorage.setItem('server', url);
+    this.server.set(url); // Apollo et les images lisent cette valeur
+    try {
+      await this.worldQuery.refetch(); // on recharge le monde depuis le nouveau serveur
+    } catch (error) {
+      this.notify('Impossible de joindre ce serveur', 'erreur');
+    }
   }
 
   // ---------------------------------------------------------------
@@ -139,6 +168,8 @@ export class GameService {
     this.verifierUnlocks(newworld, prod);
 
     this.world.set(newworld);
+    this.audio.jouer('achat');
+    this.ajouterFlottant(product.id, '+' + qt);
     this.acheterProduitsGraphQL(product.id, qt); // on prévient le backend
   }
 
@@ -289,7 +320,7 @@ export class GameService {
     }
   }
 
-    // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
   // ANGEL UPGRADES
   // ---------------------------------------------------------------
   buyAngelUpgrade(upgrade: Palier) {

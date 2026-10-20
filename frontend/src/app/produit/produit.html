@@ -1,4 +1,9 @@
 <div class="produit-layout">
+  @for (f of gameService.flottants(); track f.n) {
+  @if (f.id === prod()?.id) {
+  <span class="flottant">{{ f.text }}</span>
+  }
+  }
   <!-- Partie gauche : image du produit avec sa quantité superposée (clic = lancer la production) -->
   <div class="produit-image" (click)="startFabrication()">
     <img class="round" [src]="gameService.server() + '/' + prod()?.logo" [alt]="prod()?.name" />
