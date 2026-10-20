@@ -1,1 +1,71 @@
-/* You can add global styles to this file, and also import other style files */
+/* MESSAGES (snackbar) */
+
+.game-snack {
+  --mat-snack-bar-supporting-text-color: #ffffff;
+  --mat-snack-bar-supporting-text-size: 1rem;
+  --mat-snack-bar-supporting-text-weight: 900;
+  --mat-snack-bar-button-color: #ffd83d;
+}
+
+.game-snack .mdc-snackbar__surface {
+  min-width: 280px;
+  padding: 4px 8px 4px 14px;
+
+  background: linear-gradient(135deg, #ad16d2 0%, #2da9e9 100%) !important;
+  border: 3px solid #ffffff;
+  border-radius: 18px;
+
+  box-shadow:
+    0 5px 0 rgba(19, 93, 140, 0.55),
+    0 10px 24px rgba(19, 93, 140, 0.35);
+}
+
+.game-snack .mdc-snackbar__label {
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* bouton OK : même style que tes boutons jaunes */
+.game-snack .mat-mdc-snack-bar-action {
+  margin-left: 8px;
+
+  background: #ffd83d;
+  color: #684d00 !important;
+
+  border: 2px solid #fff2a8;
+  border-radius: 12px;
+
+  font-weight: 900;
+  letter-spacing: 0.3px;
+
+  box-shadow: 0 3px 0 #d7ad22;
+}
+
+.game-snack .mat-mdc-snack-bar-action:hover {
+  background: #ffe66a;
+}
+
+/* image devant le texte */
+.game-snack .mdc-snackbar__label::before {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin-right: 10px;
+  vertical-align: middle;
+
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.snack-bonus .mdc-snackbar__label::before {
+  background-image: url('/images/bonus.png');
+}
+
+.snack-manager .mdc-snackbar__label::before {
+  background-image: url('/images/manager.png');
+}
+
+.snack-erreur .mdc-snackbar__label::before {
+  background-image: url('/images/erreur.png');
+}

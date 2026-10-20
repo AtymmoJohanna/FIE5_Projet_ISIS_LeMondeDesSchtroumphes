@@ -6,81 +6,164 @@ import { Palier, Product, World, RatioType } from './graphql.js';
 
 @Injectable()
 export class AppService {
+  // ---------------------------------------------------------------
+  // LECTURE / SAUVEGARDE DU MONDE
+  // ---------------------------------------------------------------
+
+  // Lit le fichier du joueur. S'il n'existe pas, on renvoie une copie du monde d'origine.
   readUserWorld(user: string): World {
-    let world: World;
     try {
       const data = fs.readFileSync(
         path.join(process.cwd(), 'userworlds/', user + '-world.json'),
       );
-      world = JSON.parse(data.toString());
+      return JSON.parse(data.toString());
     } catch (e: unknown) {
-      console.log((e as Error).message);
-      world = JSON.parse(JSON.stringify(origworld));
+      // copie "profonde" pour ne jamais modifier origworld lui-même
+      return JSON.parse(JSON.stringify(origworld));
+    }
+  }
+
+  // Écrit le monde du joueur dans son fichier
+  saveWorld(user: string, world: World) {
+    fs.mkdirSync(path.join(process.cwd(), 'userworlds'), { recursive: true }); // crée le dossier s'il n'existe pas
+    fs.writeFileSync(
+      path.join(process.cwd(), 'userworlds/', user + '-world.json'),
+      JSON.stringify(world),
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // MISE À JOUR DU SCORE EN FONCTION DU TEMPS QUI PASSE
+  // Appelée au début de CHAQUE requête : comme ça, l'argent gagné
+  // pendant que le joueur était absent est toujours pris en compte.
+  // ---------------------------------------------------------------
+  updateWorld(user: string): World {
+    const world = this.readUserWorld(user);
+    const now = Date.now();
+    // lastupdate est stocké en texte (String dans le schéma) car Date.now() est trop grand pour un Int GraphQL
+    const lastupdate = Number(world.lastupdate);
+    const elapsedTime = lastupdate === 0 ? 0 : now - lastupdate; // 0 = première connexion
+    world.lastupdate = String(now);
+
+    // bonus des anges : ex. 10 anges actifs x 2% = x1.2
+    const angelBonus = 1 + (world.activeangels * world.angelbonus) / 100;
+
+    for (const prod of world.products) {
+      if (!prod.managerUnlocked) {
+        // SANS manager : une seule production à la fois
+        if (prod.timeleft > 0) {
+          if (prod.timeleft <= elapsedTime) {
+            this.ajouterGain(world, prod, 1, angelBonus);
+            prod.timeleft = 0;
+          } else {
+            prod.timeleft -= elapsedTime;
+          }
+        }
+      } else {
+        // AVEC manager : la production se relance toute seule en boucle
+        const dejaFait = prod.timeleft > 0 ? prod.vitesse - prod.timeleft : 0;
+        const tempsTotal = dejaFait + elapsedTime;
+        const cycles = Math.floor(tempsTotal / prod.vitesse); // nb de productions terminées
+        const reste = tempsTotal % prod.vitesse; // avancement de la production en cours
+        this.ajouterGain(world, prod, cycles, angelBonus);
+        prod.timeleft = prod.vitesse - reste;
+      }
     }
     return world;
   }
-  saveWorld(user: string, world: World) {
-    fs.writeFile(
-      path.join(process.cwd(), 'userworlds/', user + '-world.json'),
-      JSON.stringify(world),
-      (err) => {
-        if (err) {
-          console.error(err);
-          throw new Error(`Erreur d'écriture du monde coté serveur`);
-        }
-      },
-    );
+
+  // Ajoute à l'argent et au score le gain de "nb" productions d'un produit
+  private ajouterGain(world: World, prod: Product, nb: number, angelBonus: number) {
+    const gain = prod.revenu * prod.quantite * nb * angelBonus;
+    world.money += gain;
+    world.score += gain;
   }
-  acheterQtProduit(user: string, id: number, quantite: number,): Product {
-    const world = this.readUserWorld(user);
+
+  // ---------------------------------------------------------------
+  // APPLIQUER UN BONUS (unlock, allunlock, cash upgrade ou angel upgrade)
+  // Une seule fonction pour tous les bonus, comme ça pas de code copié-collé.
+  // ---------------------------------------------------------------
+  private appliquerBonus(world: World, palier: Palier) {
+    // bonus sur les anges
+    if (palier.typeratio === RatioType.ange) {
+      world.angelbonus += palier.ratio;
+      return;
+    }
+    // idcible = 0 -> tous les produits, sinon seulement le produit ciblé
+    const cibles =
+      palier.idcible === 0
+        ? world.products
+        : world.products.filter((p) => p.id === palier.idcible);
+
+    for (const p of cibles) {
+      if (palier.typeratio === RatioType.vitesse) {
+        // on divise le temps de production (Math.floor car vitesse est un Int)
+        p.vitesse = Math.floor(p.vitesse / palier.ratio);
+        p.timeleft = Math.floor(p.timeleft / palier.ratio);
+      } else if (palier.typeratio === RatioType.gain) {
+        p.revenu = p.revenu * palier.ratio;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------
+  // QUERY
+  // ---------------------------------------------------------------
+  getWorld(user: string): World {
+    const world = this.updateWorld(user);
+    this.saveWorld(user, world);
+    return world;
+  }
+
+  // ---------------------------------------------------------------
+  // MUTATIONS
+  // ---------------------------------------------------------------
+  acheterQtProduit(user: string, id: number, quantite: number): Product {
+    const world = this.updateWorld(user);
     const prod = world.products.find((p) => p.id === id);
     if (!prod) {
       throw new Error(`Ce produit n'existe pas`);
     }
-    const coutachat = (prod.cout * (Math.pow(prod.croissance, quantite) - 1)) / (prod.croissance - 1)
-    const canBuy = world.money >= coutachat;
-    if (!canBuy) {
+    // coût de n produits = cout * (croissance^n - 1) / (croissance - 1)  (somme géométrique)
+    const coutachat =
+      (prod.cout * (Math.pow(prod.croissance, quantite) - 1)) / (prod.croissance - 1);
+    if (world.money < coutachat) {
       throw new Error(`Vous n'avez pas assez d'argent pour acheter ce produit`);
     }
     world.money -= coutachat;
     prod.quantite += quantite;
-    prod.cout = prod.cout * Math.pow(prod.croissance, quantite);
-    prod.revenu += prod.revenu * Math.pow(prod.croissance, quantite);
+    prod.cout = prod.cout * Math.pow(prod.croissance, quantite); // prix du prochain exemplaire
+    // (le revenu ne change PAS à l'achat : seulement avec les unlocks et upgrades)
+
+    // unlocks du produit : débloqués quand la quantité atteint le seuil
     for (const palier of prod.paliers) {
       if (!palier.unlocked && prod.quantite >= palier.seuil) {
-        if (palier.typeratio === RatioType.vitesse) {
-          prod.vitesse = Math.floor(prod.vitesse / palier.ratio);
-        } else if (palier.typeratio === RatioType.gain) {
-          prod.revenu *= palier.ratio;
-        }
+        this.appliquerBonus(world, palier);
         palier.unlocked = true;
       }
     }
+
+    // allunlocks : débloqués quand TOUS les produits atteignent le seuil
     const qteMin = Math.min(...world.products.map((p) => p.quantite));
     for (const palier of world.allunlocks) {
       if (!palier.unlocked && qteMin >= palier.seuil) {
-        if (palier.typeratio === RatioType.vitesse) {
-          world.products.forEach((p) => {
-            p.vitesse = Math.floor(p.vitesse / palier.ratio);
-          });
-        } else if (palier.typeratio === RatioType.gain) {
-          world.products.forEach((p) => {
-            p.revenu *= palier.ratio;
-          });
-        } else if (palier.typeratio === RatioType.ange) {
-          world.angelbonus += palier.ratio;
-        }
+        this.appliquerBonus(world, palier);
         palier.unlocked = true;
       }
     }
+
     this.saveWorld(user, world);
     return prod;
   }
+
   lancerProductionProduit(user: string, id: number): Product {
-    const world = this.readUserWorld(user);
+    const world = this.updateWorld(user);
     const prod = world.products.find((p) => p.id === id);
     if (!prod) {
       throw new Error(`Ce produit n'existe pas`);
+    }
+    if (prod.quantite === 0) {
+      throw new Error(`Vous ne possédez pas encore ce produit`);
     }
     if (prod.timeleft > 0) {
       throw new Error(`Ce produit est déjà en production`);
@@ -89,21 +172,22 @@ export class AppService {
     this.saveWorld(user, world);
     return prod;
   }
+
   engagerManager(user: string, name: string): Palier {
-    const world = this.readUserWorld(user);
+    const world = this.updateWorld(user);
     const manager = world.managers.find((m) => m.name === name);
     if (!manager) {
-      throw new Error(`Ce schtroumphmanager n'existe pas`);
+      throw new Error(`Ce schtroumpf manager n'existe pas`);
     }
     const product = world.products.find((p) => p.id === manager.idcible);
     if (!product) {
-      throw new Error(`Ce schtroumph manager ne gère aucun produit`);
+      throw new Error(`Ce schtroumpf manager ne gère aucun produit`);
     }
     if (manager.unlocked) {
-      throw new Error(`Ce schtroumph manager est déjà engagé`);
+      throw new Error(`Ce schtroumpf manager est déjà engagé`);
     }
     if (world.money < manager.seuil) {
-      throw new Error(`Vous n'avez pas assez d'argent pour engager ce schtroumph manager`);
+      throw new Error(`Vous n'avez pas assez d'argent pour engager ce schtroumpf manager`);
     }
     world.money -= manager.seuil;
     manager.unlocked = true;
@@ -111,44 +195,9 @@ export class AppService {
     this.saveWorld(user, world);
     return manager;
   }
-  private updateWorld(user: string): World {
-    const world = this.readUserWorld(user);
-    const now = Date.now();
-    const elapsedTime = now - world.lastupdate;
-    world.lastupdate = now;
-    if (elapsedTime > 0) {
-      const angelBonusMultiplier = 1 + world.activeangels * world.angelbonus / 100; 
-      world.products.forEach((prod) => {
-        if (!prod.managerUnlocked) {// Cas sans manager : une seule production possible, pas de boucle
-          if (prod.timeleft > 0) {
-            if (prod.timeleft <= elapsedTime) {
-              const revenue = prod.revenu * prod.quantite;
-              world.money += revenue * angelBonusMultiplier;
-              world.score += revenue * angelBonusMultiplier;
-              prod.timeleft = 0;
-            } else {
-              prod.timeleft -= elapsedTime;
-            }
-          }
-        } else { // Cas avec manager : la production se relance automatiquement en boucle
-          const progress = prod.timeleft > 0 ? prod.vitesse - prod.timeleft : 0;
-          const totalProgress = progress + elapsedTime;
-          const cycles = Math.floor(totalProgress / prod.vitesse); //combien de productions complètes ont eu lieu
-          const remainder = totalProgress % prod.vitesse; //temps déjà avancé dans le cycle actuellement en cours
-          if (cycles > 0) {
-            const gains = cycles * prod.revenu * prod.quantite;
-            world.money += gains * angelBonusMultiplier;
-            world.score += gains * angelBonusMultiplier;
-          }
-          prod.timeleft = prod.vitesse - remainder; // temps restant pour la production en cours
-        }
-      });
-      world.lastupdate = now;
-    }
-    return world;
-  }
+
   acheterCashUpgrade(user: string, name: string): Palier {
-    const world = this.readUserWorld(user);
+    const world = this.updateWorld(user);
     const upgrade = world.upgrades.find((u) => u.name === name);
     if (!upgrade) {
       throw new Error(`Cet upgrade n'existe pas`);
@@ -161,32 +210,13 @@ export class AppService {
     }
     world.money -= upgrade.seuil;
     upgrade.unlocked = true;
-    const product = world.products.find((p) => p.id === upgrade.idcible);
-    if (product) {
-      if (upgrade.typeratio === RatioType.vitesse) {
-        product.vitesse /= upgrade.ratio;
-      } else if (upgrade.typeratio === RatioType.gain) {
-        product.revenu *= upgrade.ratio;
-      } else if (upgrade.typeratio === RatioType.ange) {
-        world.angelbonus += upgrade.ratio;
-      }
-      this.saveWorld(user, world);
-    }
-    if (upgrade.idcible === 0) { // si l'upgrade concerne tous les produits
-      world.products.forEach((p) => {
-        if (upgrade.typeratio === RatioType.vitesse) {
-          p.vitesse /= upgrade.ratio;
-        } else if (upgrade.typeratio === RatioType.gain) {
-          p.revenu *= upgrade.ratio;
-        } else if (upgrade.typeratio === RatioType.ange) {
-          world.angelbonus += upgrade.ratio;
-        }
-      });
-    }
+    this.appliquerBonus(world, upgrade);
+    this.saveWorld(user, world);
     return upgrade;
   }
+
   acheterAngelUpgrade(user: string, name: string): Palier {
-    const world = this.readUserWorld(user);
+    const world = this.updateWorld(user);
     const upgrade = world.angelupgrades.find((u) => u.name === name);
     if (!upgrade) {
       throw new Error(`Cet upgrade n'existe pas`);
@@ -197,40 +227,32 @@ export class AppService {
     if (world.activeangels < upgrade.seuil) {
       throw new Error(`Vous n'avez pas assez d'anges pour acheter cet upgrade`);
     }
-    world.activeangels -= upgrade.seuil;
+    world.activeangels -= upgrade.seuil; // les anges dépensés sont perdus
     upgrade.unlocked = true;
-    const product = world.products.find((p) => p.id === upgrade.idcible);
-    if (product) {
-      if (upgrade.typeratio === RatioType.vitesse) {
-        product.vitesse /= upgrade.ratio;
-      } else if (upgrade.typeratio === RatioType.gain) {
-        product.revenu *= upgrade.ratio;
-      }
-      this.saveWorld(user, world);
-    }
-    if (upgrade.idcible === 0) { // si l'upgrade concerne tous les produits
-      world.products.forEach((p) => {
-        if (upgrade.typeratio === RatioType.vitesse) {
-          p.vitesse /= upgrade.ratio;
-        } else if (upgrade.typeratio === RatioType.gain) {
-          p.revenu *= upgrade.ratio;
-        } else if (upgrade.typeratio === RatioType.ange) {
-          world.angelbonus += upgrade.ratio;
-        }
-      });
-    }
+    this.appliquerBonus(world, upgrade);
+    this.saveWorld(user, world);
     return upgrade;
   }
+
   resetWorld(user: string): World {
     const world = this.updateWorld(user);
-    const newTotalAngels = Math.floor(150 * Math.sqrt(world.score / Math.pow(10, 15))); //à corriger
-    const angesGagnes = newTotalAngels - world.totalangels;
-    const newWorld : World = JSON.parse(JSON.stringify(origworld));
-    
-    newWorld.score = world.score; // le score ne repart jamais à zéro
-    newWorld.totalangels = newTotalAngels;
+    // formule du jeu d'origine : anges = 150 * racine(score / 10^15)
+    const newTotalAngels = Math.floor(150 * Math.sqrt(world.score / Math.pow(10, 15)));
+    const angesGagnes = Math.max(0, newTotalAngels - world.totalangels);
+
+    // on repart du monde d'origine...
+    const newWorld: World = JSON.parse(JSON.stringify(origworld));
+    // ... mais on garde le score, les anges et les angel upgrades déjà achetés
+    newWorld.score = world.score;
+    newWorld.totalangels = world.totalangels + angesGagnes;
     newWorld.activeangels = world.activeangels + angesGagnes;
-    newWorld.lastupdate = Date.now();
+    newWorld.lastupdate = String(Date.now());
+    newWorld.angelupgrades = world.angelupgrades;
+    for (const upgrade of newWorld.angelupgrades) {
+      if (upgrade.unlocked) {
+        this.appliquerBonus(newWorld, upgrade); // on réapplique leurs bonus au nouveau monde
+      }
+    }
     this.saveWorld(user, newWorld);
     return newWorld;
   }

@@ -7,7 +7,7 @@ export class GraphQlResolver {
     constructor(private service: AppService) { }
     @Query()
     async getWorld(@Args('user') user: string) {
-        const world = this.service.readUserWorld(user);
+        const world = this.service.getWorld(user); 
         return world;
     }
     @Mutation()
